@@ -1,0 +1,45 @@
+name: tom_fenicsx_macos
+channels:
+  - conda-forge
+dependencies:
+  - python=3.12
+
+  # Toolchain (macOS uses Clang + LLVM OpenMP)
+  - compilers              # pulls clang/clangxx/fortran from conda-forge
+  - llvm-openmp
+  - cmake
+  - ninja
+  - pkg-config
+
+  # Core FEniCSx stack
+  - fenics-dolfinx=0.9.*
+  - mpich                  # (or keep: mpi=mpich + mpich)
+  - petsc=3.22.*
+  - petsc4py=3.22.*
+  - slepc=3.22.*
+  - slepc4py=3.22.*
+  - hdf5=*=mpi_mpich*      # ensure HDF5 matches the MPI choice
+  - h5py=*=mpi_mpich*      # <-- match h5py to MPICH variant
+
+  # Numerics / IO / viz
+  - numpy
+  - scipy
+  - matplotlib
+  - pyvista
+  - vtk=9.3.*              # optional pin
+  - meshio
+
+  # Jupyter
+  - ipykernel
+  - jupyterlab
+  - pip
+
+  # PyTorch via pip (no CUDA on macOS; MPS on Apple Silicon)
+  - pip:
+      - torch==2.6.*
+      - torchvision==0.21.*
+      - torchaudio==2.6.*
+      - scikit-image
+      - shapely
+      - trimesh
+      - wandb
