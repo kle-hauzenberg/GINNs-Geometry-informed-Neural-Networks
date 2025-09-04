@@ -60,6 +60,13 @@ def main():
         device = 'cpu'
         print('CUDA not available - proceeding on CPU')
 
+    # Do NOT set global default device to 'mps' — it breaks vmap/dynamo on import.
+    # Keep default tensors on CPU; just set dtype globally and pass the device around.
+    torch.set_default_dtype(torch.float32)
+
+    # Expose device to the rest of the code
+    config['device'] = device
+
     # Modern PyTorch way: set default device & dtype (avoid deprecated set_default_tensor_type)
     torch.set_default_device(device)
     torch.set_default_dtype(torch.float32)
