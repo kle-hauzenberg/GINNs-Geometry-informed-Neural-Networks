@@ -53,9 +53,6 @@ def main():
             raise NotImplementedError('Multi-GPU training not supported yet')
         device = 'cuda:0'
         print(f'Visible CUDA devices: {os.getenv("CUDA_VISIBLE_DEVICES")} - using device {device}')
-    elif getattr(torch.backends, 'mps', None) and torch.backends.mps.is_available():
-        device = 'mps'
-        print('Using Apple Silicon MPS backend.')
     else:
         device = 'cpu'
         print('CUDA not available - proceeding on CPU')
