@@ -1,5 +1,3 @@
-
-
 """
 Entry point for starting the training.
 Checks and performs global config, including the device and the model.
@@ -47,22 +45,26 @@ def main():
 
     set_all_seeds(config.get('seed', random.randint(20, 1000000)))
 
-    # set default device after cuda visibility has been configured in compute_config
-    if torch.cuda.is_available():
+    # Choose device after CUDA visibility has been configured
+    if torch.cuda.is_available() and torch.cuda.device_count() >= 1:
         if torch.cuda.device_count() > 1:
             for i_cuda in range(torch.cuda.device_count()):
                 print(torch.cuda.get_device_properties(i_cuda).name)
             raise NotImplementedError('Multi-GPU training not supported yet')
-        elif torch.cuda.device_count() == 1:
-            # device = f'cuda:{os.getenv("CUDA_VISIBLE_DEVICES")}'
-            device = f'cuda:0'
-        else:
-            device = 'cpu'
+        device = 'cuda:0'
         print(f'Visible CUDA devices: {os.getenv("CUDA_VISIBLE_DEVICES")} - using device {device}')
-        torch.set_default_device(device)
+    elif getattr(torch.backends, 'mps', None) and torch.backends.mps.is_available():
+        device = 'mps'
+        print('Using Apple Silicon MPS backend.')
     else:
+        device = 'cpu'
         print('CUDA not available - proceeding on CPU')
-    torch.set_default_tensor_type('torch.cuda.FloatTensor')
+
+    # Modern PyTorch way: set default device & dtype (avoid deprecated set_default_tensor_type)
+    torch.set_default_device(device)
+    torch.set_default_dtype(torch.float32)
+    # Make device visible to the rest of the code if needed
+    config['device'] = device
     
     # NOTE: to disable wandb set the ENV
     # "WANDB_MODE": "disabled"
